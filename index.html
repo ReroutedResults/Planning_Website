@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RR Planning Intelligence</title>
+  <meta name="description" content="Agricultural and renewables planning permissions across Ireland, mapped and searchable.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23165a4a'/><text x='16' y='21.5' font-family='Arial' font-weight='700' font-size='14' fill='white' text-anchor='middle'>RR</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#/">
+      <span class="logo" aria-hidden="true">RR</span>
+      <div>
+        <h1>RR Planning Intelligence</h1>
+        <p class="sub" id="crumb">Agricultural &amp; renewables planning permissions across Ireland</p>
+      </div>
+    </a>
+    <div class="top-actions">
+      <span class="freshness" id="freshness"></span>
+      <button type="button" id="lockAll" class="ghost" hidden>Lock all</button>
+    </div>
+  </header>
+
+  <!-- HOME -->
+  <main id="home" class="home" hidden>
+    <div class="home-inner">
+      <div class="home-head">
+        <div>
+          <h2>Categories</h2>
+          <p class="muted">Each section needs its own password. Planning permissions only (no retentions). New applications are added every Monday.</p>
+        </div>
+        <button type="button" id="masterBtn" class="primary">Unlock all with master password</button>
+      </div>
+      <div id="cards" class="cards"></div>
+      <p id="homeMsg" class="state" hidden></p>
+    </div>
+  </main>
+
+  <!-- PASSWORD GATE -->
+  <main id="gate" class="gate" hidden>
+    <form id="gateForm" class="gate-card" autocomplete="off">
+      <div class="lock-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      </div>
+      <h2 id="gateTitle">Locked</h2>
+      <p class="muted" id="gateHint">Enter the password for this section.</p>
+      <input type="password" id="pw" placeholder="Password" required autocomplete="current-password">
+      <p id="gateErr" class="err" role="alert" hidden></p>
+      <button type="submit" class="primary" id="gateBtn">Unlock</button>
+      <a href="#/" class="back">&larr; All categories</a>
+    </form>
+  </main>
+
+  <!-- CATEGORY EXPLORER -->
+  <main id="explorer" class="explorer" hidden>
+    <form class="searchbar" id="searchForm" autocomplete="off">
+      <div class="field grow">
+        <label for="q">Keywords</label>
+        <input id="q" type="search" placeholder='e.g. "bulk tank" Cork'>
+      </div>
+      <div class="field">
+        <label for="term">Matched phrase</label>
+        <select id="term"><option value="">All phrases</option></select>
+      </div>
+      <div class="field">
+        <label for="council">Council</label>
+        <select id="council"><option value="">All councils</option></select>
+      </div>
+      <div class="field">
+        <label for="since">Received</label>
+        <select id="since">
+          <option value="">Any time</option>
+          <option value="new">New in latest update</option>
+          <option value="7">Last 7 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="90">Last 3 months</option>
+          <option value="180">Last 6 months</option>
+          <option value="365">Last 12 months</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="outcome">Outcome</label>
+        <select id="outcome">
+          <option value="">Any outcome</option>
+          <option value="granted">Granted</option>
+          <option value="refused">Refused</option>
+          <option value="pending">No decision yet</option>
+          <option value="other">Withdrawn / invalid / other</option>
+        </select>
+      </div>
+      <label class="check"><input type="checkbox" id="inView"> Only in map view</label>
+      <button type="button" id="reset" class="ghost">Reset</button>
+    </form>
+
+    <div class="layout">
+      <section class="results" aria-label="Results">
+        <div class="results-head">
+          <div id="summary" class="summary" aria-live="polite"></div>
+          <div class="head-actions">
+            <select id="sort" aria-label="Sort results">
+              <option value="received-desc">Newest first</option>
+              <option value="received-asc">Oldest first</option>
+              <option value="decided-desc">Recently decided</option>
+              <option value="council-asc">Council A–Z</option>
+            </select>
+            <button type="button" id="csv" class="ghost small" title="Download the filtered results as a spreadsheet (CSV)">CSV</button>
+          </div>
+        </div>
+        <ol id="list" class="list"></ol>
+        <div class="pager">
+          <button id="prev" type="button" class="small" disabled>&larr; Prev</button>
+          <span id="pageInfo"></span>
+          <button id="next" type="button" class="small" disabled>Next &rarr;</button>
+        </div>
+      </section>
+      <section class="mapwrap" aria-label="Map">
+        <div id="map"></div>
+        <div class="legend">
+          <span><i class="dot granted"></i>Granted</span>
+          <span><i class="dot refused"></i>Refused</span>
+          <span><i class="dot pending"></i>Pending</span>
+          <span><i class="dot other"></i>Other</span>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="foot">
+    Source: <a href="https://data.gov.ie/dataset/national-planning-applications" target="_blank" rel="noopener">National Planning Applications</a>,
+    Department of Housing, Local Government and Heritage (CC BY 4.0). Always check the council's planning file for the official record.
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

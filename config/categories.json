@@ -1,0 +1,24 @@
+{
+  "daysBack": 7,
+  "firstRunMonths": 12,
+  "categories": [
+    { "id": "dairy", "name": "Dairy / milking", "secret": "RR_PW_DAIRY",
+      "terms": ["milking parlour", "milking parlor", "dairy parlour", "dairy unit", "milking unit", "rotary parlour", "robotic milking", "milking robot", "dairy extension", "dairy building"] },
+    { "id": "cow-housing", "name": "Cow housing", "secret": "RR_PW_COW_HOUSING",
+      "terms": ["cubicle shed", "cubicles", "cubicle house", "cow accommodation", "livestock housing", "cattle housing"] },
+    { "id": "slurry", "name": "Slurry", "secret": "RR_PW_SLURRY",
+      "terms": ["slurry tank", "slatted tank", "underground tank", "slurry storage", "slurry store", "effluent tank", "soiled water tank", "slatted shed"] },
+    { "id": "farm-buildings", "name": "Farm buildings", "secret": "RR_PW_FARM_BUILDINGS",
+      "terms": ["agricultural shed", "agricultural building", "farm building", "livestock shed", "cattle shed", "farmyard development", "agricultural development"] },
+    { "id": "calving", "name": "Calving / calves", "secret": "RR_PW_CALVING",
+      "terms": ["calving shed", "calving pens", "calf shed", "calf house", "calf accommodation", "calf rearing"] },
+    { "id": "feed", "name": "Feed", "secret": "RR_PW_FEED",
+      "terms": ["meal bin"] },
+    { "id": "milk-storage", "name": "Milk storage", "secret": "RR_PW_MILK_STORAGE",
+      "terms": ["bulk milk tank", "bulk tank", "milk tank", "milk silo", "dairy washroom", "dairy room"] },
+    { "id": "yards", "name": "Yards / infrastructure", "secret": "RR_PW_YARDS",
+      "terms": ["collecting yard", "holding yard", "waiting yard", "handling yard", "cattle handling", "farm roadway"] },
+    { "id": "renewables", "name": "Renewables", "secret": "RR_PW_RENEWABLES",
+      "terms": ["solar panels", "photovoltaic", "pv panels", "solar pv", "rooftop solar", "battery storage"] }
+  ]
+}
