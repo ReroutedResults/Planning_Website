@@ -1,0 +1,47 @@
+name: Weekly data update
+
+on:
+  schedule:
+    # Every Monday at 05:00 UTC (6am Irish summer time, 5am winter)
+    - cron: '0 5 * * 1'
+  workflow_dispatch: # adds a "Run workflow" button on the Actions tab
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Add last week's planning applications and encrypt
+        run: node scripts/build.mjs
+        env:
+          RR_PW_MASTER: ${{ secrets.RR_PW_MASTER }}
+          RR_PW_DAIRY: ${{ secrets.RR_PW_DAIRY }}
+          RR_PW_COW_HOUSING: ${{ secrets.RR_PW_COW_HOUSING }}
+          RR_PW_SLURRY: ${{ secrets.RR_PW_SLURRY }}
+          RR_PW_FARM_BUILDINGS: ${{ secrets.RR_PW_FARM_BUILDINGS }}
+          RR_PW_CALVING: ${{ secrets.RR_PW_CALVING }}
+          RR_PW_FEED: ${{ secrets.RR_PW_FEED }}
+          RR_PW_MILK_STORAGE: ${{ secrets.RR_PW_MILK_STORAGE }}
+          RR_PW_YARDS: ${{ secrets.RR_PW_YARDS }}
+          RR_PW_RENEWABLES: ${{ secrets.RR_PW_RENEWABLES }}
+
+      - name: Publish updated data
+        run: |
+          git config user.name "rr-data-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          git commit -m "Weekly data update $(date -u +%Y-%m-%d)" || echo "No changes"
+          git push
